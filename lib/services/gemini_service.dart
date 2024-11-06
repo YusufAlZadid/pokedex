@@ -2,11 +2,12 @@ import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
-  final String apiKey = 'AIzaSyAVc67WKSONvgO91BiaXB2KustvMzY6mfM';
-  late GenerativeModel model;
+  final String apiKey = 'AIzaSyCC4sK4bJQgnBhW7FArtDf9QvNBibTiUW0';  // Replace with your actual API key
+  late final GenerativeModel model;
 
   GeminiService() {
-    model = GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
+    // Update the model version here
+    model = GenerativeModel(model: 'gemini-1.5-flash-002', apiKey: apiKey);
   }
 
   Future<String> identifyPokemon(String imagePath) async {
@@ -18,6 +19,8 @@ class GeminiService {
           DataPart('image/png', imageBytes),
         ])
       ];
+
+      // Make the API request and process the response
       final response = await model.generateContent(content);
       if (response.text != null && response.text!.isNotEmpty) {
         return _extractPokemonName(response.text!);
@@ -30,11 +33,11 @@ class GeminiService {
   }
 
   String _extractPokemonName(String responseText) {
-    // List of possible patterns
+    // Define regex patterns to match the Pokémon name in the response
     final patterns = [
-      RegExp(r'\b(?:This is|That pokemon is|It is|The Pokémon is)\s+(\w+)\b', caseSensitive: false),
-      RegExp(r'\b(?:This looks like|It looks like|Appears to be|Looks like)\s+(\w+)\b', caseSensitive: false),
-      RegExp(r'\b(?:Identified as|Recognized as)\s+(\w+)\b', caseSensitive: false)
+      RegExp(r'\b(?:This is|That Pokémon is|It is|The Pokémon is)\s+(\w+)', caseSensitive: false),
+      RegExp(r'\b(?:This looks like|It looks like|Appears to be|Looks like)\s+(\w+)', caseSensitive: false),
+      RegExp(r'\b(?:Identified as|Recognized as)\s+(\w+)', caseSensitive: false),
     ];
 
     for (var pattern in patterns) {
@@ -44,7 +47,7 @@ class GeminiService {
       }
     }
 
-    // If no pattern matches, return the response text without periods
-    return responseText.replaceAll('.', '');
+    // If no pattern matches, return the response text without punctuation
+    return responseText.replaceAll('.', '').trim();
   }
 }
